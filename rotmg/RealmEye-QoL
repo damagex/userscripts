@@ -1,0 +1,219 @@
+// ==UserScript==
+// @name         RealmEye
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.realmeye.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=realmeye.com
+// @grant        none
+// ==/UserScript==
+
+(_ => {
+    'use strict';
+    const itemData = [{"id":"2592","title":"Potion of Defense"},{"id":"2591","title":"Potion of Attack"},{"id":"2593","title":"Potion of Speed"},{"id":"2636","title":"Potion of Dexterity"},{"id":"2613","title":"Potion of Wisdom"},{"id":"2612","title":"Potion of Vitality"},{"id":"2794","title":"Potion of Mana"},{"id":"2793","title":"Potion of Life"},{"id":"9065","title":"Greater Potion of Defense"},{"id":"9064","title":"Greater Potion of Attack"},{"id":"9066","title":"Greater Potion of Speed"},{"id":"9069","title":"Greater Potion of Dexterity"},{"id":"9068","title":"Greater Potion of Wisdom"},{"id":"9067","title":"Greater Potion of Vitality"},{"id":"9071","title":"Greater Potion of Mana"},{"id":"9070","title":"Greater Potion of Life"},{"id":"1826","title":"Wine Cellar Incantation"},{"id":"10024","title":"Helmet Rune"},{"id":"10023","title":"Shield Rune"},{"id":"10022","title":"Sword Rune"},{"id":"1808","title":"Tomb of the Ancients Key"},{"id":"3089","title":"Ocean Trench Key"},{"id":"3118","title":"Davy's Key"},{"id":"3119","title":"Lab Key"},{"id":"3170","title":"Candy Key"},{"id":"3278","title":"Deadwater Docks Key"},{"id":"3311","title":"Battle Nexus Key"},{"id":"24109","title":"Treasure Map"},{"id":"3293","title":"Shatters Key"},{"id":"8848","title":"Bella's Key"},{"id":"8852","title":"Shaitan's Key"},{"id":"3284","title":"Draconis Key"},{"id":"29804","title":"Puppet Master's Encore Key"},{"id":"29836","title":"Ice Cave Key"},{"id":"32695","title":"Ice Tomb Key"},{"id":"303","title":"Mountain Temple Key"},{"id":"4252","title":"The Nest Key"},{"id":"2991","title":"Lost Halls Key"},{"id":"2555","title":"Reef Key"},{"id":"3872","title":"Mad God Mayhem Key"},{"id":"13984","title":"Secluded Thicket Key"},{"id":"9325","title":"Heroic Abyss of Demons Key"},{"id":"1413","title":"Malogia Key"},{"id":"1415","title":"Forax Key"},{"id":"1414","title":"Untaris Key"},{"id":"1412","title":"Fungal Cavern Key"},{"id":"9658","title":"Ancient Ruins Key"},{"id":"15731","title":"High Tech Terror Key"},{"id":"19301","title":"The Third Dimension Key"},{"id":"5705","title":"St. Patricks Key"},{"id":"1799","title":"Healing Ichor"},{"id":"3105","title":"Holy Water"},{"id":"2868","title":"Fire Water"},{"id":"3090","title":"Coral Juice"},{"id":"2736","title":"Minor Health Potion"},{"id":"2781","title":"Minor Magic Potion"},{"id":"3109","title":"Ghost Pirate Rum"},{"id":"3267","title":"Saint Paddy's Brew"},{"id":"3130","title":"Blue Paradise"},{"id":"3132","title":"Lime Jungle Bay"},{"id":"584","title":"Gravel"},{"id":"10243","title":"Gluhwein"},{"id":"1409","title":"Server Heart"},{"id":"2835","title":"Effusion of Defense"},{"id":"3436","title":"Effusion of Attack"},{"id":"3437","title":"Effusion of Speed"},{"id":"2832","title":"Effusion of Dexterity"},{"id":"3439","title":"Effusion of Wisdom"},{"id":"2834","title":"Effusion of Mana"},{"id":"2833","title":"Effusion of Life"},{"id":"2831","title":"Tincture of Defense"},{"id":"3433","title":"Tincture of Speed"},{"id":"2828","title":"Tincture of Dexterity"},{"id":"2829","title":"Tincture of Life"},{"id":"2799","title":"White Drake Egg"},{"id":"2801","title":"Orange Drake Egg"},{"id":"2803","title":"Yellow Drake Egg"},{"id":"2641","title":"Magic Mushroom"},{"id":"5407","title":"Valentine"},{"id":"8780","title":"Potion of Health4"},{"id":"8827","title":"Agent Skin"},{"id":"30822","title":"Antinomy Archer Skin"},{"id":"30818","title":"Antinomy Assassin Skin"},{"id":"30814","title":"Antinomy Bard Skin"},{"id":"30834","title":"Antinomy Huntress Skin"},{"id":"31279","title":"Antinomy Kensei Skin"},{"id":"30824","title":"Antinomy Mystic Skin"},{"id":"30828","title":"Antinomy Necromancer Skin"},{"id":"30836","title":"Antinomy Ninja Skin"},{"id":"30846","title":"Antinomy Paladin Skin"},{"id":"30826","title":"Antinomy Priest Skin"},{"id":"30838","title":"Antinomy Rogue Skin"},{"id":"30842","title":"Antinomy Sorcerer Skin"},{"id":"30832","title":"Antinomy Summoner Skin"},{"id":"30844","title":"Antinomy Warrior Skin"},{"id":"30840","title":"Antinomy Wizard Skin"},{"id":"8861","title":"Artemis Skin"},{"id":"29828","title":"Ascended Sorcerer Skin"},{"id":"8830","title":"Bashing Bride Skin"},{"id":"8983","title":"B.B. Wolf Skin"},{"id":"8815","title":"Brigand Skin"},{"id":"9448","title":"Construction Archer Skin"},{"id":"9460","title":"Construction Assassin Skin"},{"id":"9464","title":"Construction Huntress Skin"},{"id":"30973","title":"Construction Kensei Skin"},{"id":"9456","title":"Construction Knight Skin"},{"id":"9472","title":"Construction Ninja Skin"},{"id":"9458","title":"Construction Paladin Skin"},{"id":"9470","title":"Construction Sorcerer Skin"},{"id":"30702","title":"Construction Summoner Skin"},{"id":"9468","title":"Construction Trickster Skin"},{"id":"9454","title":"Construction Warrior Skin"},{"id":"9450","title":"Construction Wizard Skin"},{"id":"9230","title":"Court Wizard Skin"},{"id":"29832","title":"Dark Elf Huntress Skin"},{"id":"8851","title":"Deadly Vixen Skin"},{"id":"29825","title":"Death Skin"},{"id":"29820","title":"Demon Spawn Skin"},{"id":"8995","title":"Drow Trickster Skin"},{"id":"8831","title":"Eligible Bachelor Skin"},{"id":"30975","title":"Emergent Sage Kensei Skin"},{"id":"29823","title":"Frankenstein's Monster Knight Skin"},{"id":"9074","title":"Ghost Huntress Skin"},{"id":"8783","title":"Holy Avenger Skin"},{"id":"29821","title":"Hunchback Skin"},{"id":"29819","title":"Huntsman Skin"},{"id":"3320","title":"Iceman Skin"},{"id":"9076","title":"Infected Assassin Skin"},{"id":"29824","title":"Jack the Ripper Skin"},{"id":"8985","title":"King Knifeula Skin"},{"id":"9237","title":"Kings Bowman Archer Skin"},{"id":"9227","title":"Kingsman Cavalry Warrior Skin"},{"id":"9228","title":"Kingsman Guard Knight Skin"},{"id":"8984","title":"Lil Red Skin"},{"id":"3313","title":"Little Helper Skin"},{"id":"30740","title":"Menagerie Master Summoner Skin"},{"id":"29829","title":"Mischievous Imp Skin"},{"id":"10206","title":"Mystery Huntress Skin"},{"id":"10208","title":"Mystery Mystic Skin"},{"id":"10204","title":"Mystery Necromancer Skin"},{"id":"10200","title":"Mystery Paladin Skin"},{"id":"10194","title":"Mystery Priest Skin"},{"id":"10216","title":"Mystery Samurai Skin"},{"id":"8993","title":"Nexus no Miko Skin"},{"id":"8858","title":"Nun Skin"},{"id":"8320","title":"Oryxmas Archer Skin"},{"id":"8326","title":"Oryxmas Assassin Skin"},{"id":"9390","title":"Oryxmas Bard Skin"},{"id":"8328","title":"Oryxmas Huntress Skin"},{"id":"8324","title":"Oryxmas Knight Skin"},{"id":"8329","title":"Oryxmas Mystic Skin"},{"id":"8327","title":"Oryxmas Necromancer Skin"},{"id":"8332","title":"Oryxmas Ninja Skin"},{"id":"8325","title":"Oryxmas Paladin Skin"},{"id":"8322","title":"Oryxmas Priest Skin"},{"id":"8319","title":"Oryxmas Rogue Skin"},{"id":"19660","title":"Oryxmas Samurai Skin"},{"id":"30804","title":"Oryxmas Summoner Skin"},{"id":"8330","title":"Oryxmas Trickster Skin"},{"id":"8323","title":"Oryxmas Warrior Skin"},{"id":"8321","title":"Oryxmas Wizard Skin"},{"id":"8980","title":"Platinum Knight Skin"},{"id":"8982","title":"Platinum Rogue Skin"},{"id":"8981","title":"Platinum Warrior Skin"},{"id":"29831","title":"Poltergeist Skin"},{"id":"29769","title":"Puppet Master Skin"},{"id":"8796","title":"Ranger Skin"},{"id":"9240","title":"Royal Sorcerer Skin"},{"id":"3312","title":"Santa Skin"},{"id":"8812","title":"Scarlett Skin"},{"id":"9235","title":"Sensei Ninja Skin"},{"id":"8781","title":"Shoveguy Skin"},{"id":"9075","title":"Skeleton Warrior Skin"},{"id":"9038","title":"Slime Assassin Skin"},{"id":"9036","title":"Slime Huntress Skin"},{"id":"31235","title":"Slime Kensei Skin"},{"id":"9035","title":"Slime Mystic Skin"},{"id":"9037","title":"Slime Necromancer Skin"},{"id":"9615","title":"Slime Ninja Skin"},{"id":"9039","title":"Slime Paladin Skin"},{"id":"9040","title":"Slime Rogue Skin"},{"id":"9033","title":"Slime Sorcerer Skin"},{"id":"9034","title":"Slime Trickster Skin"},{"id":"8850","title":"Slime Wizard Skin"},{"id":"8860","title":"Sorceress Skin"},{"id":"8856","title":"Stanley the Spring Bunny Skin"},{"id":"19451","title":"Stone Assassin Skin"},{"id":"19453","title":"Stone Huntress Skin"},{"id":"19449","title":"Stone Knight Skin"},{"id":"19452","title":"Stone Necromancer Skin"},{"id":"19457","title":"Stone Ninja Skin"},{"id":"19456","title":"Stone Sorcerer Skin"},{"id":"30718","title":"Stone Summoner Skin"},{"id":"29826","title":"Tiny Avatar Skin"},{"id":"9340","title":"Traveling Songster Bard Skin"},{"id":"29830","title":"Vampire Hunter Skin"},{"id":"29822","title":"Vampiress Skin"},{"id":"9232","title":"Wandering Gypsy Mystic Skin"},{"id":"8859","title":"Witch Doctor Skin"},{"id":"9011","title":"Witch Skin"},{"id":"29827","title":"Zombie Nurse Skin"},{"id":"31413","title":"Syndicate Henchman Bard Skin"},{"id":"31415","title":"Syndicate Henchman Knight Skin"},{"id":"31417","title":"Syndicate Henchman Assassin Skin"},{"id":"31419","title":"Syndicate Henchman Samurai Skin"},{"id":"31421","title":"Syndicate Henchman Archer Skin"},{"id":"31423","title":"Syndicate Henchman Mystic Skin"},{"id":"31425","title":"Syndicate Henchman Priest Skin"},{"id":"31427","title":"Syndicate Henchman Necromancer Skin"},{"id":"31429","title":"Syndicate Henchman Trickster Skin"},{"id":"31431","title":"Syndicate Henchman Summoner Skin"},{"id":"31433","title":"Syndicate Henchman Huntress Skin"},{"id":"31435","title":"Syndicate Henchman Ninja Skin"},{"id":"31437","title":"Syndicate Henchman Rogue Skin"},{"id":"31439","title":"Syndicate Henchman Wizard Skin"},{"id":"31441","title":"Syndicate Henchman Sorcerer Skin"},{"id":"31443","title":"Syndicate Henchman Warrior Skin"},{"id":"31445","title":"Syndicate Henchman Paladin Skin"},{"id":"31447","title":"Syndicate Henchman Kensei Skin"},{"id":"2721","title":"Staff of Diabolic Secrets T10"},{"id":"2722","title":"Staff of Astral Knowledge T11"},{"id":"2824","title":"Staff of the Cosmic Whole T12"},{"id":"2513","title":"Staff of the Vital Unity T13"},{"id":"3075","title":"Staff of Extreme Prejudice UT"},{"id":"5847","title":"Staff of Iceblast UT"},{"id":"3108","title":"Anatis Staff UT"},{"id":"3306","title":"KoalaPOW UT"},{"id":"8843","title":"Staff of Adoration UT"},{"id":"8857","title":"Staff of the Rising Sun UT"},{"id":"8998","title":"Barely Attuned Magic Thingy UT"},{"id":"3859","title":"Staff of Horrific Knowledge UT"},{"id":"9059","title":"The Phylactery UT"},{"id":"8615","title":"Legacy Sentient Staff UT"},{"id":"14493","title":"Staff of Silver Wings UT"},{"id":"25688","title":"Foramite Staff UT"},{"id":"6860","title":"Frosty's Walking Stick UT"},{"id":"1894","title":"Staff of Esben UT"},{"id":"12069","title":"Screwdriver Staff UT"},{"id":"20977","title":"Staff of the Saint UT"},{"id":"1394","title":"K.I.D.D. Force UT"},{"id":"21099","title":"Spellblade of Corrupt Premonitions T10"},{"id":"21100","title":"Spellblade of Starry Insight T11"},{"id":"21101","title":"Spellblade of the Sun T12"},{"id":"21102","title":"Spellblade of the Heavens Light T13"},{"id":"2694","title":"Wand of Shadow T10"},{"id":"2695","title":"Wand of Ancient Warning T11"},{"id":"2806","title":"Wand of Recompense T12"},{"id":"2506","title":"Wand of Evocation T13"},{"id":"2879","title":"Crystal Wand UT"},{"id":"3076","title":"Wand of the Bulwark UT"},{"id":"5848","title":"Eternal Snowflake Wand UT"},{"id":"3101","title":"St. Abraham's Wand UT"},{"id":"3123","title":"Conducting Wand UT"},{"id":"3307","title":"Spicy Wand of Spice UT"},{"id":"8844","title":"Wand of Budding Romance UT"},{"id":"8999","title":"Lethargic Sentience UT"},{"id":"8854","title":"Wand of Egg-cellence UT"},{"id":"3856","title":"Wand of Ancient Terror UT"},{"id":"9055","title":"Wand of Geb UT"},{"id":"9084","title":"Present Dispensing Wand UT"},{"id":"14494","title":"Wand of the Summoned One UT"},{"id":"6861","title":"Winter's Breath Wand UT"},{"id":"24834","title":"Soul's Guidance UT"},{"id":"5138","title":"Frozen Wand UT"},{"id":"12070","title":"Measuring Wand UT"},{"id":"19324","title":"Rainbow Rod UT"},{"id":"1398","title":"Caduceus of Current Craziness UT"},{"id":"2635","title":"Sprite Wand UT"},{"id":"21094","title":"Morning Star of the Night T10"},{"id":"21095","title":"Morning Star of Harrowing Memories T11"},{"id":"21096","title":"Morning Star of Repentance T12"},{"id":"21097","title":"Morning Star of Conjuration T13"},{"id":"2700","title":"Bow of Fey Magic T10"},{"id":"2701","title":"Bow of Innocent Blood T11"},{"id":"2818","title":"Bow of Covert Havens T12"},{"id":"2508","title":"Bow of Mystical Energy T13"},{"id":"6858","title":"Icicle Launcher UT"},{"id":"3074","title":"Doom Bow UT"},{"id":"8961","title":"Bow of the Morning Star UT"},{"id":"25696","title":"Sun's Judgement UT"},{"id":"3088","title":"Coral Bow UT"},{"id":"5849","title":"Arctic Bow UT"},{"id":"3308","title":"Robobow UT"},{"id":"8997","title":"Precisely Calibrated Stringstick UT"},{"id":"3858","title":"Bow of Nightmares UT"},{"id":"9610","title":"Bow of Eternal Frost UT"},{"id":"14492","title":"Bow of the Sky's Glory UT"},{"id":"12067","title":"Nail Gun Bow UT"},{"id":"5706","title":"Clover Bow UT"},{"id":"1397","title":"Butter Bow UT"},{"id":"14415","title":"Ignis UT"},{"id":"28686","title":"Mystic Longbow T10"},{"id":"28687","title":"Crimson Longbow T11"},{"id":"28688","title":"Longbow of the Endless Sky T12"},{"id":"28689","title":"Longbow of the Morning Spirit T13"},{"id":"2697","title":"Emeraldshard Dagger T10"},{"id":"2698","title":"Agateclaw Dagger T11"},{"id":"2815","title":"Dagger of Foul Malevolence T12"},{"id":"2502","title":"Dagger of Sinister Deeds T13"},{"id":"2849","title":"Chicken Leg of Doom UT"},{"id":"3106","title":"Bone Dagger UT"},{"id":"3113","title":"Spirit Dagger UT"},{"id":"1801","title":"Poison Fang Dagger UT"},{"id":"3309","title":"Sunshine Shiv UT"},{"id":"8845","title":"Heartfind Dagger UT"},{"id":"9002","title":"Dagger of the Amethyst Prism UT"},{"id":"9000","title":"Toy Knife UT"},{"id":"3857","title":"Dagger of the Terrible Talon UT"},{"id":"8608","title":"Legacy Etherite Dagger UT"},{"id":"9085","title":"An Icicle UT"},{"id":"14491","title":"Dagger of Eternal Chaos UT"},{"id":"12068","title":"Spatula Dagger UT"},{"id":"2201","title":"Dagger of the Hasteful Rabbit UT"},{"id":"20983","title":"Prismatic Slasher UT"},{"id":"1408","title":"Corruption Cutter UT"},{"id":"25698","title":"Dueling Daggers UT"},{"id":"6859","title":"Frost Lich's Finger UT"},{"id":"1396","title":"Mister Mango UT"},{"id":"17438","title":"Occult Blades T11"},{"id":"17439","title":"Bloodshed Blades T12"},{"id":"17455","title":"Moonstone Blades T13"},{"id":"2692","title":"Archon Sword T10"},{"id":"2631","title":"Skysplitter Sword T11"},{"id":"2827","title":"Sword of Acclaim T12"},{"id":"2504","title":"Sword of Splendor T13"},{"id":"2563","title":"Crystal Sword UT"},{"id":"3073","title":"Demon Blade UT"},{"id":"8963","title":"Sword of Illumination UT"},{"id":"3077","title":"Ancient Stone Sword UT"},{"id":"3291","title":"Pirate King's Cutlass UT"},{"id":"3295","title":"Doctor Swordsworth UT"},{"id":"8732","title":"Skull-splitter Sword UT"},{"id":"8846","title":"Vinesword UT"},{"id":"9659","title":"Arcane Rapier UT"},{"id":"8962","title":"Sword of the Mad God UT"},{"id":"8996","title":"Unstable Anomaly UT"},{"id":"9063","title":"Legacy Pixie-Enchanted Sword UT"},{"id":"9612","title":"Frostbite UT"},{"id":"19212","title":"Keychain Cutlass UT"},{"id":"14495","title":"Sword of the Unending Chaos UT"},{"id":"25691","title":"Gaseous Glaive UT"},{"id":"5846","title":"Enchanted Ice Blade UT"},{"id":"6862","title":"Saint Nicolas' Blade UT"},{"id":"1705","title":"Apocalypse Feather UT"},{"id":"5707","title":"Sword of the Rainbow's End UT"},{"id":"23334","title":"Silex's Hammer UT"},{"id":"1395","title":"MMace MMurderer UT"},{"id":"17556","title":"Mithril Flail T11"},{"id":"17557","title":"Celebrant Flail T12"},{"id":"17558","title":"Divine Flail T13"},{"id":"3150","title":"Ichimonji T10"},{"id":"3151","title":"Muramasa T11"},{"id":"3152","title":"Masamune T12"},{"id":"586","title":"Sadamune T13"},{"id":"3292","title":"Doku No Ken UT"},{"id":"3310","title":"Arbiter's Wrath UT"},{"id":"8842","title":"Diamond-Bladed Katana UT"},{"id":"3860","title":"Corrupted Cleaver UT"},{"id":"14497","title":"Skybound Blade UT"},{"id":"25693","title":"Fire Blade UT"},{"id":"12072","title":"Sawblade Katana UT"},{"id":"29037","title":"Void Blade UT"},{"id":"6863","title":"Yuki UT"},{"id":"23332","title":"Krathana UT"},{"id":"14413","title":"Tsunami UT"},{"id":"17429","title":"Dragonbone Tachi T10"},{"id":"17430","title":"Accursed Tachi T11"},{"id":"17431","title":"Skyslash Tachi T12"},{"id":"17432","title":"Sunset Tachi T13"},{"id":"2708","title":"Robe of the Shadow Magus T10"},{"id":"2709","title":"Robe of the Moon Wizard T11"},{"id":"2710","title":"Robe of the Elder Warlock T12"},{"id":"2821","title":"Robe of the Grand Sorcerer T13"},{"id":"2511","title":"Robe of the Star Mother T14"},{"id":"8863","title":"Robe of the Summer Solstice UT"},{"id":"3103","title":"Chasuble of Holy Light UT"},{"id":"3122","title":"Robe of the Mad Scientist UT"},{"id":"3203","title":"Cheater Robe UT"},{"id":"3092","title":"Robe of the Tlatoani UT"},{"id":"9052","title":"Shendyt of Geb UT"},{"id":"9056","title":"Soulless Robe UT"},{"id":"8616","title":"Legacy Robe of Twilight UT"},{"id":"14499","title":"Robe of Dark Summoning UT"},{"id":"5851","title":"Frost Elementalist Robe UT"},{"id":"12073","title":"Magic Construction Vest UT"},{"id":"14074","title":"Tlatoani's Shroud UT"},{"id":"2705","title":"Desolation Armor T10"},{"id":"2706","title":"Vengeance Armor T11"},{"id":"2707","title":"Abyssal Armor T12"},{"id":"2812","title":"Acropolis Armor T13"},{"id":"2500","title":"Dominion Armor T14"},{"id":"9015","title":"Almandine Armor of Anger UT"},{"id":"3169","title":"Candy-Coated Armor UT"},{"id":"3182","title":"Resurrected Warrior's Armor UT"},{"id":"3204","title":"Cheater Heavy Armor UT"},{"id":"9060","title":"Legacy Fairy Plate UT"},{"id":"14500","title":"Armor of Heavenly Light UT"},{"id":"5853","title":"Frost Citadel Armor UT"},{"id":"12075","title":"Heavy Construction Vest UT"},{"id":"2622","title":"Snakeskin Armor UT"},{"id":"2702","title":"Roc Leather Armor T10"},{"id":"2703","title":"Hippogriff Hide Armor T11"},{"id":"2704","title":"Griffon Hide Armor T12"},{"id":"2809","title":"Hydra Skin Armor T13"},{"id":"2497","title":"Wyrmhide Armor T14"},{"id":"3096","title":"Coral Silk Armor UT"},{"id":"3112","title":"Spectral Cloth Armor UT"},{"id":"3202","title":"Cheater Light Armor UT"},{"id":"8609","title":"Legacy Mantle of Skuld UT"},{"id":"14498","title":"Shadowbeast Hide UT"},{"id":"4310","title":"Beehemoth Armor UT"},{"id":"4309","title":"Beehemoth Armor UT"},{"id":"4308","title":"Beehemoth Armor UT"},{"id":"12074","title":"Fitted Construction Vest UT"},{"id":"5850","title":"Frost Drake Hide Armor UT"},{"id":"15717","title":"Greaterhosen UT"},{"id":"2785","title":"Cloak of Endless Twilight T5"},{"id":"2855","title":"Cloak of Ghostly Concealment T6"},{"id":"2650","title":"Cloak of the Planewalker UT"},{"id":"8610","title":"Legacy Ghastly Drape UT"},{"id":"8333","title":"Cloak of Winter UT"},{"id":"23335","title":"Mirror Cloak UT"},{"id":"2661","title":"Golden Quiver T5"},{"id":"2856","title":"Quiver of Elvish Mastery T6"},{"id":"8336","title":"Coalbearing Quiver UT"},{"id":"23337","title":"Archerang UT"},{"id":"2608","title":"Magic Nova Spell T5"},{"id":"2852","title":"Elemental Detonation Spell T6"},{"id":"8862","title":"Thousand Suns Spell UT"},{"id":"8617","title":"Legacy Ancient Spell: Pierce UT"},{"id":"8338","title":"Vigil Spell UT"},{"id":"23330","title":"Random Spell Extraction Device UT"},{"id":"23339","title":"Spelling Spell UT"},{"id":"2651","title":"Tome of Divine Favor T5"},{"id":"2853","title":"Tome of Holy Guidance T6"},{"id":"3102","title":"Tome of Holy Protection UT"},{"id":"3081","title":"Tome of Purification UT"},{"id":"9054","title":"Book of Geb UT"},{"id":"8342","title":"Nativity Tome UT"},{"id":"23341","title":"Tome of Moral Support UT"},{"id":"1405","title":"Necronomicon UT"},{"id":"2667","title":"Golden Helm T5"},{"id":"2857","title":"Helm of the Great General T6"},{"id":"8335","title":"Pathfinder's Helm UT"},{"id":"9661","title":"Amber Encrusted Helmet UT"},{"id":"23343","title":"Challenger Helm UT"},{"id":"2572","title":"Mithril Shield T5"},{"id":"2850","title":"Colossus Shield T6"},{"id":"9017","title":"Onyx Shield of the Mad God UT"},{"id":"2624","title":"Snakeskin Shield UT"},{"id":"8340","title":"Resounding Shield UT"},{"id":"23344","title":"Shield of Pogmur UT"},{"id":"2645","title":"Seal of the Holy Warrior T5"},{"id":"2854","title":"Seal of the Blessed Champion T6"},{"id":"9062","title":"Legacy Seal of the Enchanted Forest UT"},{"id":"8344","title":"Advent Seal UT"},{"id":"23346","title":"Seal of Eternal Life UT"},{"id":"9660","title":"Sandstone Seal UT"},{"id":"2728","title":"Nightwing Venom T5"},{"id":"2858","title":"Baneserpent Poison T6"},{"id":"3181","title":"Plague Poison UT"},{"id":"8343","title":"Holly Poison UT"},{"id":"23347","title":"Lightning in a Bottle UT"},{"id":"29040","title":"Murky Toxin UT"},{"id":"2735","title":"Lifedrinker Skull T5"},{"id":"2859","title":"Bloodsucker Skull T6"},{"id":"8337","title":"Skull of Krampus UT"},{"id":"23349","title":"Epiphany Skull UT"},{"id":"1895","title":"Skullish Remains of Esben UT"},{"id":"2742","title":"Dragonstalker Trap T5"},{"id":"2860","title":"Giantcatcher Trap T6"},{"id":"8339","title":"Greedsnatcher Trap UT"},{"id":"23351","title":"Helium Trap UT"},{"id":"2630","title":"Banishment Orb T5"},{"id":"2861","title":"Planefetter Orb T6"},{"id":"9058","title":"Soul of the Bearer UT"},{"id":"8334","title":"Snowbound Orb UT"},{"id":"23352","title":"Karma Orb UT"},{"id":"2848","title":"Prism of Phantoms T5"},{"id":"2851","title":"Prism of Apparitions T6"},{"id":"3114","title":"Ghostly Prism UT"},{"id":"8341","title":"Ornamental Prism UT"},{"id":"2322","title":"Prism of Dancing Swords UT"},{"id":"23353","title":"Fool's Prism UT"},{"id":"19254","title":"Prismimic UT"},{"id":"2867","title":"Scepter of Storms T6"},{"id":"3120","title":"Scepter of Fulmination UT"},{"id":"8346","title":"Scepter of Sainthood UT"},{"id":"23354","title":"Honey Scepter Supreme UT"},{"id":"3160","title":"Ice Star T5"},{"id":"3161","title":"Doom Circle T6"},{"id":"8345","title":"Ilex Star UT"},{"id":"23355","title":"Unshuriken UT"},{"id":"29718","title":"Clover Star UT"},{"id":"14149","title":"Spider Shuriken UT"},{"id":"6831","title":"Jade-Imbued Wakizashi T5"},{"id":"6832","title":"Royal Wakizashi T6"},{"id":"613","title":"Peppermint Wakizashi UT"},{"id":"23357","title":"NSFWakizashi UT"},{"id":"1407","title":"Ronin's Wakizashi UT"},{"id":"8994","title":"Wakizashi of Eastern Winds UT"},{"id":"9152","title":"Wakizashi of Crossing Fires UT"},{"id":"14207","title":"Lullaby UT"},{"id":"19950","title":"Snake Charmer Pungi UT"},{"id":"19951","title":"Pharaoh's Requiem UT"},{"id":"14408","title":"Monarch Mace T5"},{"id":"14409","title":"Sovereign Mace T6"},{"id":"14341","title":"Mace of the North Pole UT"},{"id":"18499","title":"Recursion Mace UT"},{"id":"10291","title":"Mace of the Celestial Forest UT"},{"id":"14613","title":"Serpentine Sheath T5"},{"id":"14614","title":"Great Shinobi Sheath T6"},{"id":"14661","title":"Paper Machete UT"},{"id":"14818","title":"Volcanic Sheath UT"},{"id":"14820","title":"Quartermaster Scabbard UT"},{"id":"2757","title":"Ring of Paramount Health T4"},{"id":"2759","title":"Ring of Exalted Attack T5"},{"id":"2760","title":"Ring of Exalted Defense T5"},{"id":"2761","title":"Ring of Exalted Speed T5"},{"id":"2762","title":"Ring of Exalted Vitality T5"},{"id":"2763","title":"Ring of Exalted Wisdom T5"},{"id":"2764","title":"Ring of Exalted Dexterity T5"},{"id":"2765","title":"Ring of Exalted Health T5"},{"id":"2766","title":"Ring of Exalted Magic T5"},{"id":"9016","title":"Almandine Ring of Wrath UT"},{"id":"8960","title":"Ring of the Burning Sun UT"},{"id":"2979","title":"Ring of Unbound Attack T6"},{"id":"2980","title":"Ring of Unbound Defense T6"},{"id":"2981","title":"Ring of Unbound Speed T6"},{"id":"2982","title":"Ring of Unbound Vitality T6"},{"id":"2983","title":"Ring of Unbound Wisdom T6"},{"id":"2984","title":"Ring of Unbound Dexterity T6"},{"id":"2985","title":"Ring of Unbound Health T6"},{"id":"2986","title":"Ring of Unbound Magic T6"},{"id":"2990","title":"Ring of Decades UT"},{"id":"2976","title":"Ring of the Sphinx UT"},{"id":"2977","title":"Ring of the Nile UT"},{"id":"2978","title":"Ring of the Pyramid UT"},{"id":"3121","title":"Experimental Ring UT"},{"id":"3167","title":"Candy Ring UT"},{"id":"2878","title":"Amulet of Dispersion UT"},{"id":"2625","title":"Snake Eye Ring UT"},{"id":"25790","title":"Oryxmas Ornament: Exposed UT"},{"id":"25789","title":"Oryxmas Ornament: Weak UT"},{"id":"25788","title":"Oryxmas Ornament: Energized UT"},{"id":"4058","title":"Mask of Anubis UT"},{"id":"4059","title":"Mask of Lightning UT"},{"id":"4061","title":"Mask of Mucus UT"},{"id":"4060","title":"Mask of Cnidaria UT"},{"id":"19250","title":"Crystal Key UT"},{"id":"32722","title":"Enchanted Ice Shard UT"},{"id":"9053","title":"Geb's Ring of Wisdom UT"},{"id":"9057","title":"Ring of the Covetous Heart UT"},{"id":"9061","title":"Legacy Ring of Pure Wishes UT"},{"id":"8611","title":"Legacy Spectral Ring of Horrors UT"},{"id":"8618","title":"Legacy Forgotten Ring UT"},{"id":"9669","title":"The Forgotten Ring UT"},{"id":"3095","title":"Crystal Bone Ring UT"},{"id":"3091","title":"Coral Ring UT"},{"id":"3111","title":"Captain's Ring UT"},{"id":"2109","title":"Fairy Ring UT"},{"id":"8841","title":"Corsair Ring UT"},{"id":"14399","title":"Amulet of Elemental Air UT"},{"id":"14400","title":"Amulet of Elemental Water UT"},{"id":"14401","title":"Amulet of Elemental Earth UT"},{"id":"3193","title":"Golden Ribcage"},{"id":"9018","title":"The Devil Tarot Card"},{"id":"9019","title":"The Sun Tarot Card"},{"id":"9020","title":"Death Tarot Card"},{"id":"9021","title":"The Tower Tarot Card"},{"id":"9022","title":"The Magician Tarot Card"},{"id":"9025","title":"The Moon Tarot Card"},{"id":"3861","title":"The Fool Tarot Card"},{"id":"3205","title":"Common Feline Egg"},{"id":"3209","title":"Common Canine Egg"},{"id":"3221","title":"Common Farm Egg"},{"id":"3229","title":"Common Reptile Egg"},{"id":"3233","title":"Common Insect Egg"},{"id":"3237","title":"Common Penguin Egg"},{"id":"3241","title":"Common Aquatic Egg"},{"id":"3245","title":"Common Spooky Egg"},{"id":"3249","title":"Common Humanoid Egg"},{"id":"3253","title":"Common ???? Egg"},{"id":"3257","title":"Common Automaton Egg"},{"id":"3261","title":"Common Mystery Egg"},{"id":"3210","title":"Uncommon Canine Egg"},{"id":"3218","title":"Uncommon Exotic Egg"},{"id":"3222","title":"Uncommon Farm Egg"},{"id":"3226","title":"Uncommon Woodland Egg"},{"id":"3230","title":"Uncommon Reptile Egg"},{"id":"3234","title":"Uncommon Insect Egg"},{"id":"3238","title":"Uncommon Penguin Egg"},{"id":"3242","title":"Uncommon Aquatic Egg"},{"id":"3246","title":"Uncommon Spooky Egg"},{"id":"3250","title":"Uncommon Humanoid Egg"},{"id":"3254","title":"Uncommon ???? Egg"},{"id":"3258","title":"Uncommon Automaton Egg"},{"id":"3262","title":"Uncommon Mystery Egg"},{"id":"3207","title":"Rare Feline Egg"},{"id":"3211","title":"Rare Canine Egg"},{"id":"3215","title":"Rare Avian Egg"},{"id":"3219","title":"Rare Exotic Egg"},{"id":"3223","title":"Rare Farm Egg"},{"id":"3227","title":"Rare Woodland Egg"},{"id":"3231","title":"Rare Reptile Egg"},{"id":"3235","title":"Rare Insect Egg"},{"id":"3243","title":"Rare Aquatic Egg"},{"id":"3247","title":"Rare Spooky Egg"},{"id":"3251","title":"Rare Humanoid Egg"},{"id":"3255","title":"Rare ???? Egg"},{"id":"3259","title":"Rare Automaton Egg"},{"id":"3263","title":"Rare Mystery Egg"}];
+
+    const main = _ => {
+        injectCSS();
+        renderItemSelectorSearch();
+        renderOfferSearch();
+    }
+
+    const renderItemSelectorSearch = _ => {
+        const selector = document.querySelector("#item-selector");
+        if (!selector) return;
+        const inputEl = document.createElement("input");
+        inputEl.style.display = "block";
+        inputEl.addEventListener("input", evt => {
+            const target = evt.target.value.toLowerCase();
+            selector.querySelectorAll(".item-wrapper").forEach(el => {
+                el.style.display = "none";
+                if (el.title.toLowerCase().includes(target)) {
+                    el.style.display = "inline-block";
+                }
+            });
+
+        });
+        const modalBody = selector.querySelector(".modal-body");
+        if (!modalBody) return;
+        modalBody.prepend(inputEl);
+    }
+
+    const renderOfferSearch = _ => {
+        const searchWrap = document.createElement("div");
+        searchWrap.style.position = "relative";
+
+        searchWrap.querySelectorAll("input[type=hidden]").forEach(el => {
+            el.parentNode.addEventListener("click", evt => {
+               console.log(el.value);
+            });
+        });
+        const inputEl = document.createElement("input");
+        inputEl.id = "offerSearch";
+        inputEl.style.display = "block";
+        inputEl.addEventListener("input", evt => {
+            const target = evt.target.value.toLowerCase();
+        });
+        inputEl.addEventListener("change", evt => {
+            gotoOffer(evt.target);
+        });
+        const body = document.querySelector("body > .container");
+        if (!body) return;
+        searchWrap.append(inputEl);
+        body.prepend(searchWrap);
+        autocomplete(document.getElementById("offerSearch"), itemData.map(el => el.title));
+    }
+
+
+    const fetchItemData = _ => {
+        let items = [];
+        document.querySelectorAll(".item-wrapper").forEach(el => {
+            const title = el.querySelector(".item").title;
+            const idEl = el.querySelector(".item-selling");
+            if (!idEl || !idEl.href) return;
+            const id = idEl.href.split("/").pop();
+            if (parseInt(id) < 0) return;
+            items.push({
+                id: id,
+                title: title,
+            });
+
+        });
+        console.log(items);
+    }
+
+    const gotoOffer = target => {
+        const item = itemData.find(el => el.title.toLowerCase() === target.value.toLowerCase());
+        if (!item) return;
+        window.location.href = "https://www.realmeye.com/offers-to/sell/" + item.id;
+    }
+
+    const autocomplete = (inp, arr) => {
+        let currentFocus;
+        inp.addEventListener("input", function(e) {
+            var a, b, i, val = this.value;
+            closeAllLists();
+            if (!val) { return false;}
+            currentFocus = -1;
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            this.parentNode.appendChild(a);
+
+            for (i = 0; i < arr.length; i++) {
+                if (arr[i].toUpperCase().includes(val.toUpperCase())) {
+                    b = document.createElement("DIV");
+                    b.innerHTML = arr[i];
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    b.addEventListener("click", function(e) {
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        inp.addEventListener("keydown", function(e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                currentFocus++;
+                addActive(x);
+            } else if (e.keyCode == 38) {
+                currentFocus--;
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    if (x) x[currentFocus].click();
+                }
+                gotoOffer(e.target);
+            }
+        });
+        const addActive = x => {
+            if (!x) return false;
+            console.log("test");
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+        const removeActive = x => {
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+        const closeAllLists = elmnt => {
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+
+        document.addEventListener("click", e => {
+            closeAllLists(e.target);
+        });
+    }
+
+    const injectCSS = _ => {
+        const style = document.createElement("style");
+        style.textContent = `
+* { box-sizing: border-box; }
+body {
+  font: 16px Arial;
+}
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+}
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #e9e9e9;
+}
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}
+`;
+
+        document.body.append(style);
+    }
+
+    main();
+})();
+
