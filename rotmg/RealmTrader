@@ -1,0 +1,323 @@
+// ==UserScript==
+// @name         RealmEyeTrader
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.realmeye.com/trader
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=realmeye.com
+// @grant        none
+// ==/UserScript==
+
+(async _=>{
+    'use strict';
+    document.querySelector(".well").style.display = "none";
+
+    const ucfirst = str => str.charAt(0).toUpperCase() + str.slice(1);
+
+    class RealmTrader {
+        currentOffers = {};
+
+        constructor() {
+            this.init();
+        }
+
+        async init() {
+            this.initLayout();
+            await this.fetchItems();
+        }
+
+        initLayout() {
+            const elem = {
+                wrap: document.createElement("div"),
+                search: document.createElement("div"),
+                searchBar: document.createElement("div"),
+                searchInput: document.createElement("input"),
+                searchItems: document.createElement("div"),
+                offers: document.createElement("div"),
+            }
+
+            Object.keys(elem).forEach(el => {
+                elem[el].classList.add(`rt-${el}`);
+            });
+
+            elem.searchBar.append(elem.searchInput);
+            elem.search.append(elem.searchBar);
+            elem.search.append(elem.searchItems);
+            elem.wrap.append(elem.search);
+            elem.wrap.append(elem.offers);
+
+            elem.searchInput.addEventListener("input", evt => {
+                const target = evt.target.value.toLowerCase();
+                elem.searchItems.querySelectorAll(".rt-item").forEach(el => {
+                    el.style.display = "none";
+                    if (el.textContent.toLowerCase().includes(target)) {
+                        el.style.display = "block";
+                    }
+                });
+            });
+
+            document.body.append(elem.wrap);
+            this.initLayoutItemList();
+        }
+
+        initLayoutItemList() {
+            const searchItems = document.querySelector(".rt-searchItems");
+            const items = this.getItems();
+            items.forEach(item => {
+                const current = document.createElement("div");
+                current.className = "rt-item";
+                current.setAttribute("data-id", item.id);
+                current.setAttribute("data-slug", item.slug);
+                current.textContent = item.title;
+                searchItems.append(current);
+            });
+
+            searchItems.addEventListener("click", async e => {
+                if (!e.target.className.includes("rt-item")) return;
+                this.currentOffers.sell = await this.getItemOffers(e.target.getAttribute("data-id"), "sell");
+                this.currentOffers.buy = await this.getItemOffers(e.target.getAttribute("data-id"), "buy");
+                this.renderOffers();
+            });
+        }
+
+        renderOffers() {
+            if (!this.currentOffers.sell.length && !this.currentOffers.buy.length) return;
+            const offers = document.querySelector(".rt-offers");
+            offers.innerHTML = "";
+            ["sell", "buy"].forEach(type => {
+                const wrap = document.createElement("div");
+                const title = document.createElement("h2");
+                title.textContent = type + " offers";
+                wrap.append(title);
+
+                const offerWrap = document.createElement("div");
+                offerWrap.className = "rt-offer-wrap";
+                if (this.currentOffers[type].length) {
+                    this.currentOffers[type].forEach(item => {
+                        const offerElem = document.createElement("div");
+                        offerElem.className = "rt-offer";
+                        const offerItemWrap = document.createElement("div");
+                        offerItemWrap.className = "rt-offer-items";
+                        const itemSellElem = this.renderOfferItems(item, "sell");
+                        const itemBuyElem = this.renderOfferItems(item, "buy");
+                        offerItemWrap.append(itemSellElem);
+                        offerItemWrap.append(itemBuyElem);
+
+                        const offerMeta = document.createElement("div");
+                        const offerBy = document.createElement("span");
+                        const offerAdded = document.createElement("span");
+                        offerMeta.className = "rt-offer-meta";
+                        offerBy.innerHTML = `By: <a href="https://www.realmeye.com/offers-by/${item.by}">${item.by}</a> (Last Seen: ${item.seen} [${item.server}])`;
+                        offerAdded.textContent = `Added: ${item.added}`;
+                        offerMeta.append(offerBy);
+                        offerMeta.append(offerAdded);
+                        offerElem.append(offerItemWrap);
+                        offerElem.append(offerMeta);
+                        offerWrap.append(offerElem);
+                    });
+                }
+
+                wrap.append(offerWrap);
+                offers.append(wrap);
+            });
+        }
+
+        renderOfferItems(item, type) {
+            const offerItemsWrap = document.createElement("div");
+            offerItemsWrap.className = `rt-offer-${type}`;
+            const header = document.createElement("div");
+            header.textContent = ucfirst(type) + "ing";
+            header.className = "rt-header";
+            offerItemsWrap.append(header);
+            const itemsWrap = document.createElement("div");
+            itemsWrap.className = "rt-itemsWrap";
+            offerItemsWrap.append(itemsWrap);
+            item[type].forEach(i => {
+                const itemElem = this.renderItem(i);
+                itemsWrap.append(itemElem);
+            });
+
+            return offerItemsWrap;
+        }
+
+        renderItem(item) {
+            const itemWrap = document.createElement("div");
+            const itemElem = document.createElement("div");
+            const itemQty = document.createElement("div");
+            itemElem.title = this.getItemTitle(item[0]);
+            itemQty.textContent = item[1];
+            itemElem.className = "item";
+            itemElem.style.backgroundPosition = this.getItemOffset(item[0]);
+            itemWrap.append(itemElem);
+            itemWrap.append(itemQty);
+            return itemWrap;
+        }
+
+        getItems() {
+            return JSON.parse(localStorage.getItem("rt-items")) || [];
+        }
+
+        getItemTitle(id) {
+            const items = this.getItems();
+            const item = items.find(e => parseInt(e.id) === parseInt(id));
+            if (!item) return null;
+            return item.title;
+        }
+
+        getItemOffset(id) {
+            const items = this.getItems();
+            const item = items.find(e => parseInt(e.id) === parseInt(id));
+            if (!item) return null;
+            return item.offset;
+        }
+
+        async fetchItems() {
+            let req = await fetch(`https://www.realmeye.com/current-offers`);
+            let body = await req.text();
+            let wrap = document.createElement("div");
+            wrap.innerHTML = body;
+            let storedItems = this.getItems();
+            wrap.querySelectorAll(".item-wrapper").forEach(el => {
+                const title = el.querySelector(".item").title;
+                const offset = el.querySelector(".item").style.backgroundPosition;
+                const idEl = el.querySelector("a[href*=offers]");
+                const id = (idEl && idEl.href) ? parseInt(idEl.href.split("/").pop()) : null;
+                const slug = title.toLowerCase().replace(/\s/g, '-')
+                if (storedItems.find(i => i.slug === slug)) return;
+                storedItems.push({
+                    id: parseInt(id),
+                    slug: slug,
+                    title: title,
+                    offset: offset,
+                });
+            });
+            localStorage.setItem("rt-items", JSON.stringify(storedItems));
+        }
+
+        async getItemOffers(id, type) {
+            let req = await fetch(`https://www.realmeye.com/offers-to/${type}/${id}`);
+            let body = await req.text();
+            let wrap = document.createElement("div");
+            wrap.innerHTML = body;
+            let itemTable = wrap.querySelector("#g");
+            let offers = [];
+            for (var i = 1; i < itemTable.rows.length; i++) {
+                const sellData = itemTable.rows[i].cells[0];
+                const buyData = itemTable.rows[i].cells[1];
+                offers.push({
+                    sell: Array.from(sellData.querySelectorAll(".item-static")).map(e => [
+                        e.querySelector(".item").getAttribute("data-item"),
+                        e.querySelector(".item-quantity-static").textContent
+                    ]),
+                    buy: Array.from(buyData.querySelectorAll(".item-static")).map(e => [
+                        e.querySelector(".item").getAttribute("data-item"),
+                        e.querySelector(".item-quantity-static").textContent
+                    ]),
+                    qty: itemTable.rows[i].cells[2].textContent,
+                    added: itemTable.rows[i].cells[3].textContent,
+                    by: itemTable.rows[i].cells[5].textContent,
+                    seen: itemTable.rows[i].cells[6].textContent || null,
+                    server: itemTable.rows[i].cells[7].textContent,
+                });
+            }
+            offers.sort(function(a, b) {
+                return new Date(b.seen) - new Date(a.seen);
+            });
+            return offers;
+        }
+    }
+
+    const rt = new RealmTrader();
+    let offers = await rt.getItemOffers(3076, "sell");
+
+    const injectCSS = _ => {
+        const style = document.createElement("style");
+        style.textContent = `
+.rt-wrap {
+  position: relative;
+  height: 80vh;
+  display: flex;
+}
+
+.rt-search {
+  width: 25vw;
+  height: 100%;
+  position: relative;
+}
+
+.rt-searchItems {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.rt-item {
+  border-bottom: 1px dotted #000;
+  border-top: 1px dotted #000;
+  padding: 10px 5px;
+  cursor: pointer;
+}
+
+.rt-item:hover {
+font-weight: bold;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.rt-offers {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.rt-offers > div {
+  width: 50%;
+}
+
+.rt-offer-wrap {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.rt-offer {
+  padding: 10px;
+}
+
+.rt-offer:nth-child(odd) {
+  background-color: rgba(0,0,0,0.1);
+}
+
+.rt-offer-items {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.rt-offer-items > div {
+  width: 50%;
+}
+
+.rt-offer-items .rt-header {
+  font-weight: bold;
+}
+
+.rt-itemsWrap {
+  display: flex;
+  text-align: center;
+}
+
+.rt-offer-meta {
+  margin-top: 5px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+        `;
+        document.body.append(style);
+    }
+
+    injectCSS();
+})();
