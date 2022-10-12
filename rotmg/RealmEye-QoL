@@ -15,12 +15,26 @@
 
     const main = _ => {
         injectCSS();
-        renderItemSelectorSearch();
         renderOfferSearch();
+        initItemChooser();
+        let loop = setInterval(_ => {
+            renderItemSelectorSearch();
+        }, 1000);
+    }
+
+    const initItemChooser = _ => {
+        const choosers = document.querySelectorAll(".item-chooser");
+        choosers.forEach(el => {
+           el.addEventListener("click", e => {
+               const selector = document.querySelector("#item-selector.done");
+               if (!selector) return;
+               selector.classList.remove("done");
+           });
+        });
     }
 
     const renderItemSelectorSearch = _ => {
-        const selector = document.querySelector("#item-selector");
+        const selector = document.querySelector("#item-selector:not(.done)");
         if (!selector) return;
         const inputEl = document.createElement("input");
         inputEl.style.display = "block";
@@ -32,11 +46,11 @@
                     el.style.display = "inline-block";
                 }
             });
-
         });
         const modalBody = selector.querySelector(".modal-body");
         if (!modalBody) return;
         modalBody.prepend(inputEl);
+        selector.classList.add("done");
     }
 
     const renderOfferSearch = _ => {
@@ -45,7 +59,7 @@
 
         searchWrap.querySelectorAll("input[type=hidden]").forEach(el => {
             el.parentNode.addEventListener("click", evt => {
-               console.log(el.value);
+                console.log(el.value);
             });
         });
         const inputEl = document.createElement("input");
