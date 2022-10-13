@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RealmEyeTrader
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.1.1
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.realmeye.com/trader
@@ -16,10 +16,17 @@
     const ucfirst = str => str.charAt(0).toUpperCase() + str.slice(1);
 
     class RealmTrader {
+        ref = null;
+        currentID = null;
         currentOffers = {};
 
         constructor() {
             this.init();
+            this.ref = setInterval(async _ => {
+                if (!this.currentID) return;
+                await this.getOffers(this.currentID);
+                this.renderOffers();
+            }, 60 * 1000);
         }
 
         async init() {
@@ -75,15 +82,23 @@
 
             searchItems.addEventListener("click", async e => {
                 if (!e.target.className.includes("rt-item")) return;
-                this.currentOffers.sell = await this.getItemOffers(e.target.getAttribute("data-id"), "sell");
-                this.currentOffers.buy = await this.getItemOffers(e.target.getAttribute("data-id"), "buy");
+                await this.getOffers(e.target.getAttribute("data-id"));
                 this.renderOffers();
             });
         }
 
+        async getOffers(id) {
+            this.currentOffers.sell = await this.getItemOffers(id, "sell");
+            this.currentOffers.buy = await this.getItemOffers(id, "buy");
+        }
+
         renderOffers() {
-            if (!this.currentOffers.sell.length && !this.currentOffers.buy.length) return;
             const offers = document.querySelector(".rt-offers");
+            if (!this.currentOffers.sell.length && !this.currentOffers.buy.length) {
+                offers.innerHTML = "No offers available for this item!";
+                return;
+            }
+            
             offers.innerHTML = "";
             ["sell", "buy"].forEach(type => {
                 const wrap = document.createElement("div");
@@ -200,7 +215,7 @@
             let body = await req.text();
             let wrap = document.createElement("div");
             wrap.innerHTML = body;
-            let itemTable = wrap.querySelector("#g");
+            let itemTable = wrap.querySelector(".tablesorter");
             let offers = [];
             for (var i = 1; i < itemTable.rows.length; i++) {
                 const sellData = itemTable.rows[i].cells[0];
