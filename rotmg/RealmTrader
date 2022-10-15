@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RealmEyeTrader
 // @namespace    http://tampermonkey.net/
-// @version      0.1.1
+// @version      0.2
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.realmeye.com/trader
@@ -98,7 +98,7 @@
                 offers.innerHTML = "No offers available for this item!";
                 return;
             }
-            
+
             offers.innerHTML = "";
             ["sell", "buy"].forEach(type => {
                 const wrap = document.createElement("div");
@@ -166,6 +166,35 @@
             itemElem.style.backgroundPosition = this.getItemOffset(item[0]);
             itemWrap.append(itemElem);
             itemWrap.append(itemQty);
+            itemWrap.addEventListener("mouseenter", async e => {
+                var x = event.clientX;
+                var y = event.clientY;
+                const info = await this.fetchItemInfo(item[0]);
+                const current = document.querySelector(".rt-item-tooltip");
+                if (current) {
+                    current.remove();
+                }
+                info.className = "rt-item-tooltip item-" + item[0];
+                info.style.left = `${x}px`;
+                info.style.top = `${y}px`;
+                document.body.append(info);
+            });
+
+            itemWrap.addEventListener("mouseleave", async e => {
+                const remove = () => {
+                    setTimeout(_ => {
+                        if (document.querySelector(".rt-item-tooltip").matches(':hover') || e.target.matches(':hover')) {
+                            remove();
+                        } else {
+                            const current = document.querySelector(".rt-item-tooltip.item-" + item[0]);
+                            if (current) {
+                                current.remove();
+                            }
+                        }
+                    }, 300);
+                }
+                remove();
+            });
             return itemWrap;
         }
 
@@ -180,6 +209,18 @@
             return item.title;
         }
 
+        getItemSlug(id) {
+            const items = this.getItems();
+            const item = items.find(e => parseInt(e.id) === parseInt(id));
+            if (!item) return null;
+            return item.slug;
+        }
+        getItemInfo(id) {
+            const items = this.getItems();
+            const item = items.find(e => parseInt(e.id) === parseInt(id));
+            if (!item) return null;
+            return item.info;
+        }
         getItemOffset(id) {
             const items = this.getItems();
             const item = items.find(e => parseInt(e.id) === parseInt(id));
@@ -208,6 +249,34 @@
                 });
             });
             localStorage.setItem("rt-items", JSON.stringify(storedItems));
+        }
+
+        async fetchItemInfo(id) {
+            let slug = this.getItemSlug(id);
+            slug = slug.replace("-ut", "").replace("-st", "");
+            slug = slug.replace("-key", "");
+            for (let i = 15; i > 0; i--) {
+                slug = slug.replace("-t" + i, "");
+            }
+            let html = this.getItemInfo(id);
+            let wrap = document.createElement("div");
+            wrap.innerHTML = html;
+            if (!html) {
+                let storedItems = this.getItems();
+                let req = await fetch(`https://www.realmeye.com/wiki/${slug}`);
+                let body = await req.text();
+                wrap.innerHTML = body;
+                let html = wrap.querySelector(".wiki-page").innerHTML;
+                storedItems = storedItems.map(e => {
+                    if (parseInt(e.id) === parseInt(id)) {
+                        e.info = html;
+                    }
+                    return e;
+                });
+                wrap.innerHTML = html;
+                localStorage.setItem("rt-items", JSON.stringify(storedItems));
+            }
+            return wrap;
         }
 
         async getItemOffers(id, type) {
@@ -328,6 +397,17 @@ font-weight: bold;
   font-size: 12px;
   display: flex;
   justify-content: space-between;
+}
+
+.rt-item-tooltip {
+  padding: 15px;
+  position: absolute;
+  width: 400px;
+  height: 600px;
+  overflow: auto;
+  background: #FFF;
+  border: 1px solid #000;
+  box-shadow: 0 0 1px 1px #000;
 }
 
         `;
